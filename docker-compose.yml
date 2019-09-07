@@ -5,29 +5,30 @@ services:
     build:
       context: elasticsearch/
       args:
-        ELK_VERSION: $ELK_VERSION      
+        ELK_VERSION: $ELK_VERSION
     volumes:
-      - /var/lib/elasticsearch:/usr/share/elasticsearch/data      
+      #      - /var/lib/elasticsearch:/usr/share/elasticsearch/data
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"      
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-      - efk         
+      - efk
     logging:
       driver: fluentd
       options:
         fluentd-address: localhost:24224
         tag: efk.elasticsearch
     depends_on:
-      - fluentd        
+      - fluentd
+
   kibana:
     build:
       context: kibana/
       args:
-        ELK_VERSION: $ELK_VERSION        
+        ELK_VERSION: $ELK_VERSION
     volumes:
       - ./kibana/config/:/usr/share/kibana/config
     ports:
@@ -40,12 +41,13 @@ services:
       driver: fluentd
       options:
         fluentd-address: localhost:24224
-        tag: efk.kibana  
+        tag: efk.kibana
+
   fluentd:
-    build: 
+    build:
       context: ./fluentd
       args:
-        FLUENTD_VERSION: $FLUENTD_VERSION      
+        FLUENTD_VERSION: $FLUENTD_VERSION
     volumes:
       - ./fluentd/conf:/fluentd/etc
     networks:
@@ -53,6 +55,7 @@ services:
     ports:
       - "24224:24224"
       - "24224:24224/udp"
+
 networks:
   efk:
     driver: bridge
